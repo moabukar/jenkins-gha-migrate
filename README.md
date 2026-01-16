@@ -17,36 +17,6 @@ gh actions-importer audit jenkins --output-dir audit-results
 # 4. Run parallel pipelines (Jenkins + GHA) during transition
 ```
 
-## Repository Structure
-
-```
-.
-├── README.md                    # This file
-├── docs/
-│   ├── MIGRATION_GUIDE.md       # Detailed migration playbook
-│   ├── PARALLEL_RUNNING.md      # Running Jenkins + GHA side-by-side
-│   ├── ROLLBACK_PLAN.md         # If things go wrong
-│   ├── SECRETS_MIGRATION.md     # Credentials handling
-│   └── TROUBLESHOOTING.md       # Common issues and fixes
-├── terraform/
-│   ├── modules/
-│   │   ├── github-oidc/         # AWS OIDC provider for keyless auth
-│   │   └── iam-roles/           # Per-repo IAM roles
-│   └── environments/
-│       ├── dev/                 # Dev account OIDC setup
-│       └── prod/                # Prod account OIDC setup
-├── scripts/
-│   ├── jenkins-audit.sh         # Audit existing Jenkins jobs
-│   ├── migrate-secrets.sh       # Migrate credentials to GHA
-│   ├── validate-migration.sh    # Compare Jenkins vs GHA outputs
-│   └── cutover.sh               # Final switch script
-├── workflows/
-│   └── reusable/                # Centralised reusable workflows
-└── actions/
-    ├── setup-tools/             # Composite action: common tooling
-    └── notify-slack/            # Composite action: Slack notifications
-```
-
 ## Migration Phases
 
 | Phase | Duration | Activities |
