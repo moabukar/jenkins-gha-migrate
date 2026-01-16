@@ -1,0 +1,41 @@
+name: 'Setup Common Tools'
+description: 'Install commonly used development tools'
+
+inputs:
+  node:
+    description: 'Node.js version'
+    default: ''
+  python:
+    description: 'Python version'
+    default: ''
+  aws-cli:
+    description: 'Install AWS CLI'
+    default: 'false'
+  kubectl:
+    description: 'kubectl version'
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - if: inputs.node != ''
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node }}
+        cache: 'npm'
+
+    - if: inputs.python != ''
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python }}
+
+    - if: inputs.aws-cli == 'true'
+      shell: bash
+      run: |
+        curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip -q awscliv2.zip && sudo ./aws/install && rm -rf awscliv2.zip aws/
+
+    - if: inputs.kubectl != ''
+      uses: azure/setup-kubectl@v4
+      with:
+        version: ${{ inputs.kubectl }}

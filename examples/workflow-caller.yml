@@ -1,0 +1,36 @@
+# Example: How to call reusable workflows from your repo
+# Place this in your-repo/.github/workflows/ci.yml
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    uses: your-org/gha-workflows/.github/workflows/ci-node.yml@v1
+    with:
+      node-version: '20'
+
+  build:
+    needs: ci
+    uses: your-org/gha-workflows/.github/workflows/docker-build.yml@v1
+    with:
+      image-name: my-app
+      registry: 123456789012.dkr.ecr.eu-west-2.amazonaws.com
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    uses: your-org/gha-workflows/.github/workflows/deploy.yml@v1
+    with:
+      environment: production
+      image: ${{ needs.build.outputs.image }}
+      cluster-name: prod-cluster
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}

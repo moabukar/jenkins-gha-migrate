@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      cluster-name:
+        required: true
+        type: string
+      namespace:
+        type: string
+        default: 'default'
+      aws-region:
+        type: string
+        default: 'eu-west-2'
+    secrets:
+      AWS_ROLE_ARN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - run: |
+          aws eks update-kubeconfig --name ${{ inputs.cluster-name }} --region ${{ inputs.aws-region }}
+
+      - run: |
+          kubectl set image deployment/app app=${{ inputs.image }} -n ${{ inputs.namespace }}
+          kubectl rollout status deployment/app -n ${{ inputs.namespace }} --timeout=5m
